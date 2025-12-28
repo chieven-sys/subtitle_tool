@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电影感字幕生成器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>电影感字幕生成器</h1>
+            <p>将您的照片瞬间变成带有经典字幕的电影场景</p>
+        </header>
+
+        <main class="tool-interface">
+            <div class="input-section">
+                <div class="upload-box" id="drop-zone">
+                    <input type="file" id="image-upload" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <svg class="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p class="upload-text">点击上传或拖拽图片到这里</p>
+                    </div>
+                    <img id="image-preview" class="image-preview" hidden alt="Image Preview">
+                </div>
+
+                <div class="settings-panel">
+                    <h3>字幕设置</h3>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label for="subtitle-height">字幕区域高度</label>
+                            <div class="range-wrapper">
+                                <input type="range" id="subtitle-height" min="10" max="40" value="20">
+                                <span id="subtitle-height-val">20%</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label for="font-size">字体大小</label>
+                            <div class="range-wrapper">
+                                <input type="range" id="font-size" min="2" max="10" value="4">
+                                <span id="font-size-val">4%</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label for="font-weight">字体粗细</label>
+                            <select id="font-weight">
+                                <option value="normal">常规</option>
+                                <option value="bold" selected>加粗</option>
+                                <option value="900">特粗</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="font-family">字体样式</label>
+                            <select id="font-family">
+                                <option value="Arial, sans-serif">无衬线 (Arial)</option>
+                                <option value="'Times New Roman', serif">衬线 (Times)</option>
+                                <option value="'SimHei', sans-serif">黑体</option>
+                                <option value="'SimSun', serif">宋体</option>
+                                <option value="'Microsoft YaHei', sans-serif">微软雅黑</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="text-color">文字颜色</label>
+                            <div class="color-wrapper">
+                                <input type="color" id="text-color" value="#ffffff">
+                                <span>#ffffff</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label for="outline-color">轮廓/阴影颜色</label>
+                            <div class="color-wrapper">
+                                <input type="color" id="outline-color" value="#000000">
+                                <span>#000000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-input-group">
+                    <label for="subtitle-text">字幕对话</label>
+                    <textarea id="subtitle-text" placeholder="在此输入对话...&#10;每一行都会生成一个新的堆叠层。" rows="5"></textarea>
+                </div>
+
+                <button id="generate-btn" class="primary-btn">
+                    <span>生成场景</span>
+                    <svg class="icon-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="preview-section" id="preview-section" hidden>
+                <div class="preview-header">
+                    <h2>生成结果对比</h2>
+                    <button id="download-btn" class="secondary-btn">下载结果图片</button>
+                </div>
+                <div class="comparison-container">
+                    <div class="image-card">
+                        <h3>原始图片</h3>
+                        <div class="canvas-container">
+                            <img id="original-preview" alt="原始图片">
+                        </div>
+                    </div>
+                    <div class="image-card">
+                        <h3>生成结果</h3>
+                        <div class="canvas-container">
+                            <img id="result-image" alt="生成的堆叠字幕图">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
