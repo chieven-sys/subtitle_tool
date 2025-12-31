@@ -42,6 +42,7 @@ subtitle_tool/
 1. 克隆或下载项目文件
 2. 使用现代浏览器打开 `index.html` 文件
 3. 无需额外安装或配置
+4. 你也可以在线预览效果：https://subtitle-tool-rouge.vercel.app/
 
 或者使用本地服务器（如Python的http.server）来运行：
 
