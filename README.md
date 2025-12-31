@@ -34,7 +34,8 @@ subtitle_tool/
 ├── style.css       # 样式文件
 ├── script.js       # JavaScript逻辑
 ├── PRD.md          # 产品需求文档
-└── docs/           # 文档
+├── README.md       # 项目说明文档
+└── .gitignore      # Git忽略文件配置
 ```
 
 ## 安装和运行
