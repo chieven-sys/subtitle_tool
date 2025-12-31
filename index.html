@@ -30,8 +30,11 @@
                         </svg>
                         <p class="upload-text">点击上传或拖拽图片到这里</p>
                     </div>
-                    <img id="image-preview" class="image-preview" hidden alt="Image Preview">
+                    <div id="realtime-preview-container" class="realtime-preview-container" hidden>
+                        <img id="realtime-preview" class="realtime-preview" alt="">
+                    </div>
                 </div>
+                <button id="download-btn" class="download-btn-outside" hidden>下载图片</button>
 
                 <div class="settings-panel">
                     <h3>字幕设置</h3>
@@ -90,35 +93,6 @@
                     <textarea id="subtitle-text" placeholder="在此输入对话...&#10;每一行都会生成一个新的堆叠层。" rows="5"></textarea>
                 </div>
 
-                <button id="generate-btn" class="primary-btn">
-                    <span>生成场景</span>
-                    <svg class="icon-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path
-                            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="preview-section" id="preview-section" hidden>
-                <div class="preview-header">
-                    <h2>生成结果对比</h2>
-                    <button id="download-btn" class="secondary-btn">下载结果图片</button>
-                </div>
-                <div class="comparison-container">
-                    <div class="image-card">
-                        <h3>原始图片</h3>
-                        <div class="canvas-container">
-                            <img id="original-preview" alt="原始图片">
-                        </div>
-                    </div>
-                    <div class="image-card">
-                        <h3>生成结果</h3>
-                        <div class="canvas-container">
-                            <img id="result-image" alt="生成的堆叠字幕图">
-                        </div>
-                    </div>
-                </div>
             </div>
         </main>
     </div>

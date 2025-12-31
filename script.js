@@ -2,16 +2,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('image-upload');
     const subtitleInput = document.getElementById('subtitle-text');
-    const generateBtn = document.getElementById('generate-btn');
     const resultImage = document.getElementById('result-image');
     const previewSection = document.getElementById('preview-section');
     const downloadBtn = document.getElementById('download-btn');
     const uploadText = document.querySelector('.upload-text');
+    const realtimePreview = document.getElementById('realtime-preview');
+    const realtimePreviewContainer = document.getElementById('realtime-preview-container');
 
     let uploadedImage = null;
 
     // Handle File Upload interaction
     dropZone.addEventListener('click', () => fileInput.click());
+
+    // Set up download functionality - bind it once at the beginning
+    downloadBtn.onclick = () => {
+        // Only download if we have a generated image
+        if (realtimePreview.src && realtimePreview.src.startsWith('data:image')) {
+            const link = document.createElement('a');
+            link.download = 'cinematic-scene.jpg';
+            link.href = realtimePreview.src;
+            link.click();
+        } else {
+            alert('请先上传图片并添加字幕内容以生成结果。');
+        }
+    };
 
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -48,16 +62,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = new Image();
             img.onload = () => {
                 uploadedImage = img;
+
                 uploadText.textContent = `已加载: ${file.name}`;
 
-                // Show preview in upload box
-                const previewImg = document.getElementById('image-preview');
-                previewImg.src = e.target.result;
-                previewImg.hidden = false;
+                // Show the original image in the realtime preview container
+                realtimePreview.src = e.target.result;
+                realtimePreviewContainer.hidden = false;
                 dropZone.classList.add('has-image');
+
+                // Show the download button after image is loaded
+                downloadBtn.hidden = false;
 
                 // Reset result
                 previewSection.hidden = true;
+
+                // Start real-time preview if there's text content
+                if (subtitleInput.value.trim()) {
+                    generateRealtimePreview();
+                }
             };
             img.src = e.target.result;
         };
@@ -67,36 +89,70 @@ document.addEventListener('DOMContentLoaded', () => {
     // Range Input Value Display Updates
     document.getElementById('subtitle-height').addEventListener('input', (e) => {
         document.getElementById('subtitle-height-val').textContent = e.target.value + '%';
+        if (uploadedImage && subtitleInput.value.trim()) {
+            generateRealtimePreview();
+        }
     });
 
     document.getElementById('font-size').addEventListener('input', (e) => {
         document.getElementById('font-size-val').textContent = e.target.value + '%';
+        if (uploadedImage && subtitleInput.value.trim()) {
+            generateRealtimePreview();
+        }
     });
 
     document.getElementById('text-color').addEventListener('input', (e) => {
         e.target.nextElementSibling.textContent = e.target.value;
+        if (uploadedImage && subtitleInput.value.trim()) {
+            generateRealtimePreview();
+        }
     });
 
     document.getElementById('outline-color').addEventListener('input', (e) => {
         e.target.nextElementSibling.textContent = e.target.value;
+        if (uploadedImage && subtitleInput.value.trim()) {
+            generateRealtimePreview();
+        }
     });
 
-    // Generate Logic
-    generateBtn.addEventListener('click', () => {
-        if (!uploadedImage) {
-            alert('请先上传一张图片。');
-            return;
+    // Listen for font weight and family changes
+    document.getElementById('font-weight').addEventListener('change', () => {
+        if (uploadedImage && subtitleInput.value.trim()) {
+            generateRealtimePreview();
         }
+    });
+
+    document.getElementById('font-family').addEventListener('change', () => {
+        if (uploadedImage && subtitleInput.value.trim()) {
+            generateRealtimePreview();
+        }
+    });
+
+    // Listen for subtitle text changes to update preview
+    subtitleInput.addEventListener('input', () => {
+        if (uploadedImage) {
+            generateRealtimePreview();
+        }
+    });
+
+    // Real-time preview generation function
+    function generateRealtimePreview() {
+        if (!uploadedImage) return;
 
         const text = subtitleInput.value.trim();
         if (!text) {
-            alert('请输入对话内容。');
+            // If there's no text, show the original image
+            realtimePreview.src = uploadedImage.src;
             return;
         }
 
         const lines = text.split('\n').filter(line => line.trim() !== '');
 
-        if (lines.length === 0) return;
+        if (lines.length === 0) {
+            // If there's no text, show the original image
+            realtimePreview.src = uploadedImage.src;
+            return;
+        }
 
         // Get Options
         const options = {
@@ -108,17 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
             outlineColor: document.getElementById('outline-color').value
         };
 
-        generateStackedImage(uploadedImage, lines, options);
-    });
-
-    function generateStackedImage(image, lines, options) {
+        // Generate the preview image
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
         // Config
         const subtitleAreaRatio = options.subtitleHeightRatio;
-        const originalWidth = image.width;
-        const originalHeight = image.height;
+        const originalWidth = uploadedImage.width;
+        const originalHeight = uploadedImage.height;
         const sliceHeight = originalHeight * subtitleAreaRatio;
 
         // Calculate total height
@@ -128,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.height = totalHeight;
 
         // Draw First Block (Full Image)
-        ctx.drawImage(image, 0, 0);
+        ctx.drawImage(uploadedImage, 0, 0);
         drawSubtitle(ctx, lines[0], originalWidth, originalHeight, sliceHeight, options);
 
         // Draw Subsequent Blocks
@@ -139,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sourceY = originalHeight - sliceHeight;
 
             ctx.drawImage(
-                image,
+                uploadedImage,
                 0, sourceY, originalWidth, sliceHeight, // Source
                 0, yPosition, originalWidth, sliceHeight // Destination
             );
@@ -148,31 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
             drawSubtitle(ctx, lines[i], originalWidth, yPosition + sliceHeight, sliceHeight, options);
         }
 
-        // Output
+        // Update the realtime preview
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        resultImage.src = dataUrl;
-
-        // Populate Original Preview in Comparison
-        const originalPreview = document.getElementById('original-preview');
-        originalPreview.src = image.src;
-
-        previewSection.hidden = false;
-
-        // Scroll to result
-        previewSection.scrollIntoView({ behavior: 'smooth' });
-
-        // Setup download
-        downloadBtn.onclick = () => {
-            const link = document.createElement('a');
-            link.download = 'cinematic-scene.jpg';
-            link.href = dataUrl;
-            link.click();
-        };
+        realtimePreview.src = dataUrl;
     }
 
     function drawSubtitle(ctx, text, width, bottomY, sliceHeight, options) {
         // Draw Mask
-        // Mask covers the 'subtitle area' of this slice. 
+        // Mask covers the 'subtitle area' of this slice.
         const maskY = bottomY - sliceHeight;
 
         ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; // 40% transparent black mask
